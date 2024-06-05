@@ -1,0 +1,22 @@
+name = "get-focus-api"
+compatibility_date = "2023-12-01"
+compatibility_flags = ["nodejs_compat"]
+
+# [vars]
+# MY_VAR = "my-variable"
+
+# [[kv_namespaces]]
+# binding = "MY_KV_NAMESPACE"
+# id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+# [[r2_buckets]]
+# binding = "MY_BUCKET"
+# bucket_name = "my-bucket"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "get-focus-db"
+database_id = "64af7aca-1551-4447-8456-b690a783df65"
+
+# [ai]
+# binding = "AI"
