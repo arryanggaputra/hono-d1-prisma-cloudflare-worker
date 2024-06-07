@@ -1,9 +1,8 @@
 import { Hono } from "hono";
-import Users from "./routes/users";
+import UserController from "./controllers/UserController";
 
 const app = new Hono();
 
-app.get("/users", new Users().index);
-app.post("/users", new Users().store);
+app.route("/users", UserController);
 
 export default app;
