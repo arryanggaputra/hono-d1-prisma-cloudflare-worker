@@ -35,6 +35,29 @@ yarn install
 
 ```
 
+### Create D1 Database
+
+Create a D1 database using `wrangler`:
+
+```
+npx wrangler d1 create your_database_name
+```
+
+The result from the command line will be:
+
+```bash
+ ⛅️ wrangler 3.59.0 (update available 3.60.0)
+-------------------------------------------------------
+✅ Successfully created DB 'your_database_name' in region APAC
+Created your new D1 database.
+
+[[d1_databases]]
+binding = "DB" # i.e. available in your Worker on env.DB
+database_name = "your_database_name"
+database_id = "f9bff70a-067b-4ad3-87d2-xxx"
+
+```
+
 Setup the environment variables. Modify `wrangler.toml` file in the root directory and change the following:
 
 ```
@@ -43,8 +66,8 @@ JWT_SECRET = "my-variable"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "xxxxx"
-database_id = "xxxxxxx"
+database_name = "your_database_name"
+database_id = "f9bff70a-067b-4ad3-87d2-xxx"
 ```
 
 ## Create wrangler migration
