@@ -2,8 +2,8 @@ name = "get-focus-api"
 compatibility_date = "2023-12-01"
 compatibility_flags = ["nodejs_compat"]
 
-# [vars]
-# MY_VAR = "my-variable"
+[vars]
+JWT_SECRET = "my-variable"
 
 # [[kv_namespaces]]
 # binding = "MY_KV_NAMESPACE"
