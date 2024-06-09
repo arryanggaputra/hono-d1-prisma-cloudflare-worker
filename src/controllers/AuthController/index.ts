@@ -5,12 +5,36 @@ import db from "~/db";
 import { exclude } from "~/db/utils";
 import validationMiddleware from "~/middleware/validationMiddleware";
 import Response from "~/utils/response";
-import { decode, sign } from "hono/jwt";
+import { sign } from "hono/jwt";
+import { hashSync } from "bcrypt-edge";
 
 const schema = z.object({
   email: z.string().min(1),
   password: z.string().min(1),
 });
+
+const schemaRegister = z
+  .object({
+    name: z.string().min(3).max(60),
+    email: z.string().min(3).max(60),
+    password: z
+      .string()
+      .min(8)
+      .regex(
+        new RegExp(
+          /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/
+        ),
+        {
+          message:
+            "Minimum 8 characters, at least one uppercase letter, one lowercase letter, one number and one special character",
+        }
+      ),
+    password_confirmation: z.string().min(8),
+  })
+  .refine((data) => data.password === data.password_confirmation, {
+    message: "Passwords don't match",
+    path: ["password_confirmation"],
+  });
 
 const AuthController = App
   /**
@@ -64,6 +88,28 @@ const AuthController = App
         token,
         data: filteredUser,
       });
+    }
+  )
+  .post(
+    "/register",
+    validationMiddleware(schemaRegister, (error, c) => {
+      return new Response(c).error(error);
+    }),
+    async (c) => {
+      const request = c.req.valid("json");
+      const hashedPassword = hashSync(request.password, 8);
+      try {
+        await db(c.env).users.create({
+          data: {
+            password: hashedPassword,
+            email: request.email ?? "",
+            name: request.name ?? "",
+          },
+        });
+      } catch (error: any) {
+        return new Response(c).error(error);
+      }
+      return c.json(request);
     }
   )
   .get("/me", (c) => {
