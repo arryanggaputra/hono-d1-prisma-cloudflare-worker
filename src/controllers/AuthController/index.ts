@@ -36,7 +36,7 @@ const schemaRegister = z
     path: ["password_confirmation"],
   });
 
-const AuthController = App
+const AuthController = App.basePath("/auth")
   /**
    * Login
    */

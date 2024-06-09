@@ -1,4 +1,3 @@
-import { Hono } from "hono";
 import db from "~/db";
 import Response from "~/utils/response";
 import { z } from "zod";
@@ -32,7 +31,7 @@ const schema = z
     path: ["password_confirmation"],
   });
 
-const UserController = App
+const UserController = App.basePath("/users")
   /**
    * get user lists
    */

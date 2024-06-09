@@ -5,7 +5,7 @@ import { jwt } from "hono/jwt";
 
 const app = App;
 
-const guestPage = ["/auth/login"];
+const guestPage = ["/auth/login", "/auth/register"];
 
 app.use("*", (c, next) => {
   const path = c.req.path;
@@ -18,7 +18,7 @@ app.use("*", (c, next) => {
   return jwtMiddleware(c, next);
 });
 
-app.route("/auth", AuthController);
-app.route("/users", UserController);
+app.route("/", AuthController);
+app.route("/", UserController);
 
 export default app;
