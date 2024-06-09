@@ -1,9 +1,10 @@
 import { Hono } from "hono";
 import db from "~/db";
 import Response from "~/utils/response";
-import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import { hashSync } from "bcrypt-edge";
+import validationMiddleware from "~/middleware/validationMiddleware";
+import App from "~/app";
 
 /**
  * Minimum 8 characters, at least one uppercase letter, one lowercase letter
@@ -31,39 +32,45 @@ const schema = z
     path: ["password_confirmation"],
   });
 
-const createUserValidation = zValidator("json", schema, (result, c) => {
-  if (!result.success) {
-    return new Response(c).error(result.error);
-  }
-});
-
-const UserController = new Hono()
+const UserController = App
   /**
    * get user lists
    */
   .get("/", async (c) => {
-    const users = await db(c.env).users.findMany();
+    const users = await db(c.env).users.findMany({
+      select: {
+        id: true,
+        email: true,
+        name: true,
+      },
+    });
     return new Response(c).success(users);
   })
 
   /**
    * create user
    */
-  .post("/", createUserValidation, async (c) => {
-    const request = c.req.valid("json");
-    const hashedPassword = hashSync(request.password, 8);
-    try {
-      await db(c.env).users.create({
-        data: {
-          password: hashedPassword,
-          email: request.email ?? "",
-          name: request.name ?? "",
-        },
-      });
-    } catch (error: any) {
+  .post(
+    "/",
+    validationMiddleware(schema, (error, c) => {
       return new Response(c).error(error);
+    }),
+    async (c) => {
+      const request = c.req.valid("json");
+      const hashedPassword = hashSync(request.password, 8);
+      try {
+        await db(c.env).users.create({
+          data: {
+            password: hashedPassword,
+            email: request.email ?? "",
+            name: request.name ?? "",
+          },
+        });
+      } catch (error: any) {
+        return new Response(c).error(error);
+      }
+      return c.json(request);
     }
-    return c.json(request);
-  });
+  );
 
 export default UserController;
